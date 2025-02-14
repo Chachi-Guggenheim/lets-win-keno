@@ -17,4 +17,4 @@ def generate():
     return jsonify({'numbers': random_numbers})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
