@@ -1,0 +1,7 @@
+name = "github-webhook-listener"
+main = "src/index.js"
+compatibility_date = "2025-06-17"
+workers_dev = true
+
+[vars]
+# GITHUB_WEBHOOK_SECRET = "your-secret-value"
