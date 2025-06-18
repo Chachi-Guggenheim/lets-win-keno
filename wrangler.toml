@@ -1,6 +1,7 @@
-name = "https://lets-win-keno.rmcaloo.workers.dev"
-main = "src/index.js"
-compatibility_date = "2025-06-17"
+# wrangler.toml
+name = 'lets-win-keno'
+main = 'src/index.js'
+compatibility_date = '2025-06-17'
 workers_dev = true
 
 [vars]
