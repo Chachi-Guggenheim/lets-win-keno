@@ -6,7 +6,7 @@ workers_dev = true
 
 # wrangler.toml (wrangler v3.88.0^)
 [observability.logs]
-enabled = false
+enabled = true
 
 [vars]
 # GITHUB_WEBHOOK_SECRET = "your-secret-value"
