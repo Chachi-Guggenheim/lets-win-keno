@@ -4,5 +4,9 @@ main = 'src/index.js'
 compatibility_date = '2025-06-17'
 workers_dev = true
 
+# wrangler.toml (wrangler v3.88.0^)
+[observability.logs]
+enabled = false
+
 [vars]
 # GITHUB_WEBHOOK_SECRET = "your-secret-value"
