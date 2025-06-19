@@ -15,6 +15,3 @@ def generate():
         return jsonify({'error': 'Number must be between 1 and 12'}), 400
     random_numbers = random.sample(range(1, 81), n)
     return jsonify({'numbers': random_numbers})
-
-if __name__ == '__main__':
-    app.run(debug=True)
