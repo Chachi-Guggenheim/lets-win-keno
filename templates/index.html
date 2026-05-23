@@ -306,6 +306,143 @@
       text-align: center;
     }
 
+    /* ── ODDS SECTION ── */
+    .odds-section {
+      margin-top: 2rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .odds-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.5rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .odds-toggle:hover { background: rgba(245,200,66,0.04); }
+
+    .odds-toggle-icon {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+    }
+
+    .odds-toggle-icon.open { transform: rotate(180deg); }
+
+    .odds-body {
+      padding: 0 1.5rem 1.5rem;
+      display: none;
+    }
+
+    .odds-body.open { display: block; }
+
+    .odds-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .odds-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 1.25rem;
+    }
+
+    .odds-tab {
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(245,200,66,0.25);
+      background: var(--bg3);
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      cursor: pointer;
+      font-family: 'DM Mono', monospace;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .odds-tab.active {
+      background: var(--gold);
+      color: #0f0e0c;
+      border-color: var(--gold);
+      font-weight: 500;
+    }
+
+    .odds-tab:hover:not(.active) {
+      border-color: rgba(245,200,66,0.6);
+      color: var(--gold);
+    }
+
+    .odds-tab.no-bonus { border-style: dashed; }
+
+    .odds-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .odds-table th {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 0 0 10px;
+      text-align: left;
+      font-weight: 400;
+      border-bottom: 1px solid rgba(245,200,66,0.1);
+    }
+
+    .odds-table th:not(:first-child) { text-align: right; }
+
+    .odds-table td {
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 0.85rem;
+      vertical-align: middle;
+    }
+
+    .odds-table td:not(:first-child) { text-align: right; }
+    .odds-table tr:last-child td { border-bottom: none; }
+
+    .odds-match { color: var(--text); font-weight: 500; }
+    .odds-val { color: var(--text-muted); font-size: 0.8rem; font-family: 'DM Mono', monospace; }
+    .odds-payout { color: var(--gold); font-family: 'DM Mono', monospace; font-size: 0.85rem; }
+
+    .odds-bar-wrap { width: 60px; display: inline-block; vertical-align: middle; }
+    .odds-bar-bg { background: var(--bg3); border-radius: 2px; height: 4px; width: 100%; }
+    .odds-bar-fill { background: var(--gold); border-radius: 2px; height: 4px; }
+
+    .odds-footer {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .odds-note {
+      font-size: 0.68rem;
+      color: #5a5248;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .odds-bonus {
+      font-size: 0.65rem;
+      font-family: 'DM Mono', monospace;
+      color: #5a5248;
+      border: 1px dashed rgba(245,200,66,0.2);
+      border-radius: 10px;
+      padding: 2px 8px;
+    }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 640px) {
       .max-sidebar { width: 80px; }
@@ -354,6 +491,33 @@
         allowfullscreen
         title="Audio guide">
       </iframe>
+    </div>
+
+    <!-- ODDS SECTION -->
+    <div class="odds-section">
+      <div class="odds-toggle" id="oddsToggle">
+        <span class="card-label" style="margin:0">Keno odds at a glance</span>
+        <span class="odds-toggle-icon" id="oddsIcon">▼</span>
+      </div>
+      <div class="odds-body" id="oddsBody">
+        <div class="odds-subtitle">Select your spot count to see MA Keno payouts</div>
+        <div class="odds-tabs" id="oddsTabs"></div>
+        <table class="odds-table">
+          <thead>
+            <tr>
+              <th style="width:28%">Matches</th>
+              <th style="width:27%">Odds (1 in)</th>
+              <th style="width:20%">Payout</th>
+              <th style="width:25%; text-align:right">Win chance</th>
+            </tr>
+          </thead>
+          <tbody id="oddsTbody"></tbody>
+        </table>
+        <div class="odds-footer">
+          <span class="odds-note">Based on $1 wager · Source: MA State Lottery</span>
+          <span class="odds-bonus" id="oddsBonus"></span>
+        </div>
+      </div>
     </div>
 
     <div class="disclaimer">
@@ -412,6 +576,71 @@
         btn.textContent = 'Generate My Numbers';
       }
     });
+  </script>
+  <script>
+    const ODDS_DATA = {
+      1:  [{ m:"1 of 1",  o:4,          p:"$2.50" }],
+      2:  [{ m:"2 of 2",  o:16.63,      p:"$5.00" },{ m:"1 of 2",o:2.63,p:"$1.00" }],
+      3:  [{ m:"3 of 3",  o:72,         p:"$25.00" },{ m:"2 of 3",o:7,p:"$2.50" }],
+      4:  [{ m:"4 of 4",  o:326,        p:"$100.00" },{ m:"3 of 4",o:23,p:"$4.00" },{ m:"2 of 4",o:4.70,p:"$1.00" }],
+      5:  [{ m:"5 of 5",  o:1511,       p:"$450.00" },{ m:"4 of 5",o:83,p:"$20.00" },{ m:"3 of 5",o:12,p:"$2.00" }],
+      6:  [{ m:"6 of 6",  o:7753,       p:"$1,600.00" },{ m:"5 of 6",o:323,p:"$50.00" },{ m:"4 of 6",o:35,p:"$7.00" },{ m:"3 of 6",o:7.70,p:"$1.00" }],
+      7:  [{ m:"7 of 7",  o:40979,      p:"$5,000.00" },{ m:"6 of 7",o:1366,p:"$100.00" },{ m:"5 of 7",o:116,p:"$20.00" },{ m:"4 of 7",o:19,p:"$3.00" },{ m:"3 of 7",o:5.71,p:"$1.00" }],
+      8:  [{ m:"8 of 8",  o:230115,     p:"$15,000.00" },{ m:"7 of 8",o:6232,p:"$1,000.00" },{ m:"6 of 8",o:423,p:"$50.00" },{ m:"5 of 8",o:55,p:"$10.00" },{ m:"4 of 8",o:12,p:"$2.00" }],
+      9:  [{ m:"9 of 9",  o:1380688,    p:"$40,000.00" },{ m:"8 of 9",o:30682,p:"$4,000.00" },{ m:"7 of 9",o:1690,p:"$200.00" },{ m:"6 of 9",o:175,p:"$25.00" },{ m:"5 of 9",o:31,p:"$5.00" },{ m:"4 of 9",o:8.76,p:"$1.00" }],
+      10: [{ m:"10 of 10",o:8911711,    p:"$100,000.00" },{ m:"9 of 10",o:163381,p:"$10,000.00" },{ m:"8 of 10",o:7384,p:"$500.00" },{ m:"7 of 10",o:621,p:"$80.00" },{ m:"6 of 10",o:87,p:"$20.00" },{ m:"5 of 10",o:19,p:"$2.00" },{ m:"0 of 10",o:22,p:"$2.00" }],
+      11: [{ m:"11 of 11",o:62381978,   p:"$500,000.00" },{ m:"10 of 11",o:945181,p:"$15,000.00" },{ m:"9 of 11",o:35244,p:"$1,500.00" },{ m:"8 of 11",o:2431,p:"$250.00" },{ m:"7 of 11",o:277,p:"$50.00" },{ m:"6 of 11",o:50,p:"$10.00" },{ m:"5 of 11",o:14,p:"$1.00" },{ m:"0 of 11",o:31,p:"$2.00" }],
+      12: [{ m:"12 of 12",o:478261833,  p:"$1,000,000.00" },{ m:"11 of 12",o:5958273,p:"$25,000.00" },{ m:"10 of 12",o:184230,p:"$2,500.00" },{ m:"9 of 12",o:10482,p:"$1,000.00" },{ m:"8 of 12",o:981,p:"$150.00" },{ m:"7 of 12",o:142,p:"$25.00" },{ m:"6 of 12",o:31,p:"$5.00" },{ m:"0 of 12",o:43,p:"$4.00" }]
+    };
+    const NO_BONUS = [10,11,12];
+    let oddsActive = 4;
+
+    const oddsTabs = document.getElementById('oddsTabs');
+    const oddsTbody = document.getElementById('oddsTbody');
+    const oddsBonus = document.getElementById('oddsBonus');
+    const oddsToggle = document.getElementById('oddsToggle');
+    const oddsBody = document.getElementById('oddsBody');
+    const oddsIcon = document.getElementById('oddsIcon');
+
+    oddsToggle.addEventListener('click', () => {
+      oddsBody.classList.toggle('open');
+      oddsIcon.classList.toggle('open');
+    });
+
+    function barW(o) { return Math.max(1, Math.min(98, Math.round((1/o)*100*200))); }
+    function pctStr(o) {
+      const p = 100/o;
+      if (p >= 1) return p.toFixed(1) + '%';
+      if (p >= 0.01) return p.toFixed(3) + '%';
+      return p.toExponential(1) + '%';
+    }
+
+    function renderOdds(s) {
+      oddsActive = s;
+      oddsTabs.querySelectorAll('.odds-tab').forEach(t => t.classList.toggle('active', +t.dataset.s === s));
+      oddsTbody.innerHTML = (ODDS_DATA[s] || []).map(r => `
+        <tr>
+          <td class="odds-match">${r.m}</td>
+          <td class="odds-val">1 in ${r.o.toLocaleString()}</td>
+          <td class="odds-payout">${r.p}</td>
+          <td><div style="display:flex;align-items:center;gap:8px;justify-content:flex-end">
+            <span style="font-size:0.72rem;color:var(--text-muted);font-family:'DM Mono',monospace">${pctStr(r.o)}</span>
+            <div class="odds-bar-wrap"><div class="odds-bar-bg"><div class="odds-bar-fill" style="width:${barW(r.o)}%"></div></div></div>
+          </div></td>
+        </tr>`).join('');
+      oddsBonus.textContent = NO_BONUS.includes(s) ? 'Keno Bonus not available' : 'Keno Bonus available';
+    }
+
+    for (let s = 1; s <= 12; s++) {
+      const b = document.createElement('button');
+      b.className = 'odds-tab' + (s === oddsActive ? ' active' : '') + (NO_BONUS.includes(s) ? ' no-bonus' : '');
+      b.textContent = s + '-spot';
+      b.dataset.s = s;
+      b.onclick = () => renderOdds(s);
+      oddsTabs.appendChild(b);
+    }
+
+    renderOdds(oddsActive);
   </script>
 </body>
 </html>
